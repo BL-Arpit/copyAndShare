@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:copy_and_share/image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,36 +49,54 @@ class _MyHomepageState extends State<MyHomepage> {
         title: const Text('Sample app'),
       ),
       body: Center(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 100,
-            ),
-            CachedNetworkImage(
-              imageUrl: notify.photoIcon,
-              placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: notify.photoIcon))
-                      .then((_) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Image url copied clipboard")));
-                  });
-                },
-                child: const Text('Copy Url')),
-            const SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(onPressed: () {}, child: const Text('share'))
-          ],
-        ),
+        child: listviewObject(notify: notify),
       ),
       // ignore: dead_code
+    );
+  }
+}
+
+class listviewObject extends StatelessWidget {
+  const listviewObject({
+    Key? key,
+    required this.notify,
+  }) : super(key: key);
+
+  final Notifications notify;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 100,
+        ),
+        CachedNetworkImage(
+          imageUrl: notify.photoIcon,
+          placeholder: (context, url) => const CircularProgressIndicator(),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        ElevatedButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: notify.photoIcon))
+                  .then((_) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Image url copied clipboard")));
+              });
+            },
+            child: const Text('Copy Url')),
+        const SizedBox(
+          height: 10,
+        ),
+        ElevatedButton(
+            onPressed: () async {
+              await Share.share(notify.photoIcon);
+            },
+            child: const Text('share'))
+      ],
     );
   }
 }
